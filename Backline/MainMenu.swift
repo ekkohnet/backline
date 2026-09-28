@@ -2,7 +2,6 @@ import AppKit
 
 enum MainMenu {
   static func build() -> NSMenu {
-
     // Menus the system fills in: available services, open windows, and Help's search.
     let services = NSMenu(title: "Services")
     let help = NSMenu(title: "Help")
@@ -63,8 +62,8 @@ enum MainMenu {
     return menu
   }
 
-  // MARK: Menu Helpers
-
+  /// Makes a menu item that sends `action` to the first object in the responder chain that handles it.
+  /// Shortcuts use Command unless `modifiers` says otherwise. An empty `key` means no shortcut.
   private static func item(
     _ title: String, _ action: Selector, key: String = "", modifiers: NSEvent.ModifierFlags = .command
   ) -> NSMenuItem {
@@ -73,6 +72,7 @@ enum MainMenu {
     return item
   }
 
+  /// Wraps a menu in an item for the menu above it, titled with the menu's own title.
   private static func submenu(_ menu: NSMenu) -> NSMenuItem {
     let item = NSMenuItem(title: menu.title, action: nil, keyEquivalent: "")
     item.submenu = menu
