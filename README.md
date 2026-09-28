@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="icon.png" width="128" alt="Backline app icon">
+</p>
+
 # Backline
 
 Backline is a standalone macOS host app for the **Helix Native** and **Helix Stadium Native** plugins from Line 6.  
