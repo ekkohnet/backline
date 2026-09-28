@@ -1,0 +1,32 @@
+{
+  "editor.formatOnSave": true,
+  "editor.quickSuggestions": {
+    "strings": "on"
+  },
+
+  "files.associations": {
+    ".swift-format": "json"
+  },
+
+  "files.readonlyInclude": {
+    "Backline.xcodeproj/**": true,
+    "Backline/AppIcon.icon/**": true,
+    "Backline/Backline.entitlements": true
+  },
+  "search.exclude": {
+    "Backline.xcodeproj/**": true
+  },
+
+  "[json][jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+
+  "[toml]": {
+    "editor.defaultFormatter": "tamasfe.even-better-toml"
+  },
+
+  "yaml.format.enable": true,
+  "[yaml]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  },
+}

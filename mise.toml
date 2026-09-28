@@ -1,0 +1,7 @@
+[tools]
+
+xcodegen = "2.46.0"
+
+[tasks."generate-project"]
+description = "Generate the Xcode project using XcodeGen."
+run = "xcodegen generate --spec project.yml"
