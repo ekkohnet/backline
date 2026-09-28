@@ -1,7 +1,6 @@
 # Backline
 
-Backline is a simple standalone macOS host app for the **Helix Native** and **Helix Stadium Native** plugins from Line 6.
-
+Backline is a standalone macOS host app for the **Helix Native** and **Helix Stadium Native** plugins from Line 6.  
 Open Backline, play Helix. No DAW required.
 
 ## Current Status
@@ -43,6 +42,4 @@ BACKLINE_DEVELOPMENT_TEAM = "YOUR_TEAM_ID"
 
 Line 6, Helix, and related product names are trademarks of Yamaha Guitar Group, Inc. They are used here only to describe compatibility.
 
-Backline is an independent project. It is not associated with, affiliated with, endorsed by, or sponsored by Line 6 or Yamaha Guitar Group. 
-
-Backline does not include any Line 6 software. Helix Native or Helix Stadium Native must be purchased and installed separately.
+Backline is an independent project. It is not associated with, affiliated with, endorsed by, or sponsored by Line 6 or Yamaha Guitar Group. Backline does not include any Line 6 software. Helix Native or Helix Stadium Native must be purchased and installed separately.
