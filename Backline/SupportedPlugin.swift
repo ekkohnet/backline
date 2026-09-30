@@ -27,7 +27,7 @@ struct SupportedPlugin {
   }
 }
 
-/// Packs a four-letter audio unit code into Core Audio's integer form.
+/// Packs a four-character audio unit code into Core Audio's integer form.
 private func fourCharCode(_ code: String) -> OSType {
   code.utf8.reduce(0) { $0 << 8 | OSType($1) }
 }

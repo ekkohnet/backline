@@ -35,6 +35,7 @@ targets:
         INFOPLIST_KEY_NSMicrophoneUsageDescription: "Backline needs audio input to run your guitar through the plugin."
         INFOPLIST_KEY_NSHumanReadableCopyright: "Copyright © 2026 Chris Simmons. MIT License."
         ENABLE_HARDENED_RUNTIME: YES
+        SWIFT_OBJC_BRIDGING_HEADER: Backline/Backline-Bridging-Header.h
     entitlements:
       path: Backline/Backline.entitlements
       properties:

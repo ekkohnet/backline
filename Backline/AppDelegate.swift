@@ -15,7 +15,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
   func applicationDidFinishLaunching(_ notification: Notification) {
     // When running tests, Xcode launches the app to host them.
-    // Skip the normal launch so tests don't open windows or start audio.
+    // Skip normal launch so tests don't open windows or start audio.
     if ProcessInfo.processInfo.environment.keys.contains(where: { $0.hasPrefix("XCTest") }) {
       return
     }
@@ -46,12 +46,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
   }
 
   private func loadPlugin() async {
-    guard let supported = SupportedPlugin.all.first(where: \.isInstalled) else {
+    guard let supportedPlugin = SupportedPlugin.all.first(where: \.isInstalled) else {
       logger.error("No supported plugin is installed.")
       return
     }
     do {
-      let plugin = try await Plugin.load(supported)
+      let plugin = try await Plugin.load(supportedPlugin)
 
       // A stand-in until the audio device provides the real rate.
       try plugin.prepare(sampleRate: 48_000)
@@ -62,14 +62,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
       logger.notice(
         """
-        Prepared \(supported.name, privacy: .public): \
+        Prepared \(supportedPlugin.name, privacy: .public): \
         \(input.channelCount) in / \(output.channelCount) out at \(output.sampleRate, format: .fixed(precision: 0)) Hz, \
         latency \(plugin.audioUnit.latency * 1000, format: .fixed(precision: 2)) ms
         """
       )
     } catch {
       logger.error(
-        "Couldn't load \(supported.name, privacy: .public): \(error, privacy: .public)"
+        "Couldn't load \(supportedPlugin.name, privacy: .public): \(error, privacy: .public)"
       )
     }
   }
