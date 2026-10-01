@@ -1,10 +1,11 @@
-import AVFAudio
+import AVFoundation
 import AppKit
 import os
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
   private var window: NSWindow?
   private var plugin: Plugin?
+  private var audioEngine: AudioEngine?
 
   private let logger = Logger(subsystem: "net.ekkoh.Backline", category: "hosting")
 
@@ -34,7 +35,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     self.window = window
 
-    Task { await loadPlugin() }
+    Task { await start() }
+  }
+
+  func applicationWillTerminate(_ notification: Notification) {
+    guard let audioEngine else { return }
+    audioEngine.stop()
+    logger.notice("Stopped audio")
   }
 
   func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
@@ -45,7 +52,75 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     true
   }
 
-  private func loadPlugin() async {
+  private func start() async {
+    guard await AVCaptureDevice.requestAccess(for: .audio) else {
+      logger.error("Audio input access was denied.")
+      return
+    }
+
+    guard let device = findDevice() else { return }
+    setUpAudio(on: device)
+    guard let audioEngine else { return }
+    await loadPlugin(sampleRate: audioEngine.sampleRate)
+    guard let plugin else { return }
+
+    do {
+      try audioEngine.start(with: plugin)
+      logger.notice("Started audio")
+      Task { await logCounts() }
+    } catch {
+      logger.error("Couldn't start audio: \(error, privacy: .public)")
+    }
+  }
+
+  private func logCounts() async {
+    while let counts = audioEngine?.counts() {
+      logger.notice(
+        """
+        Renders \(counts.renderCount) (last status \(counts.lastRenderStatus)), \
+        input pulls \(counts.pullCount) (last status \(counts.lastPullStatus))
+        """
+      )
+      try? await Task.sleep(for: .seconds(1))
+    }
+  }
+
+  private func findDevice() -> AudioDevice? {
+    do {
+      // A stand-in until choosing devices arrives.
+      guard let device = try AudioDevice.all().first(where: { try $0.name().contains("HELIX") }) else {
+        logger.error("No Helix is connected.")
+        return nil
+      }
+
+      let name = try device.name()
+      let sampleRate = try device.sampleRate()
+      let bufferSizes = try device.bufferSizeRange()
+      logger.notice(
+        """
+        Found \(name, privacy: .public) at \(sampleRate, format: .fixed(precision: 0)) Hz, \
+        buffer sizes \(bufferSizes.lowerBound)–\(bufferSizes.upperBound)
+        """
+      )
+      return device
+    } catch {
+      logger.error("Couldn't find the Helix: \(error, privacy: .public)")
+      return nil
+    }
+  }
+
+  private func setUpAudio(on device: AudioDevice) {
+    do {
+      // Stand-ins until choosing channels arrives.
+      audioEngine = try AudioEngine(device: device, inputChannel: 7, outputChannel: 1)
+      let bufferSize = try device.bufferSize()
+      logger.notice("Set up AUHAL with a buffer of \(bufferSize) samples")
+    } catch {
+      logger.error("Couldn't set up audio: \(error, privacy: .public)")
+    }
+  }
+
+  private func loadPlugin(sampleRate: Double) async {
     guard let supportedPlugin = SupportedPlugin.all.first(where: \.isInstalled) else {
       logger.error("No supported plugin is installed.")
       return
@@ -53,8 +128,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     do {
       let plugin = try await Plugin.load(supportedPlugin)
 
-      // A stand-in until the audio device provides the real rate.
-      try plugin.prepare(sampleRate: 48_000)
+      try plugin.prepare(sampleRate: sampleRate)
       self.plugin = plugin
 
       let input = plugin.audioUnit.inputBusses[0].format
