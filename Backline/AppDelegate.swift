@@ -86,9 +86,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
       "Editor is \(size.width, format: .fixed(precision: 0)) × \(size.height, format: .fixed(precision: 0))")
     window?.contentViewController = editor
     fitWindow(toEditorSize: size)
-
   }
 
+  /// Opens at twice the editor's default size, within the screen, and never smaller than the default.
   private func fitWindow(toEditorSize editorSize: NSSize) {
     guard let window, let screen = window.screen else { return }
     let available = window.contentRect(forFrameRect: screen.visibleFrame).size
