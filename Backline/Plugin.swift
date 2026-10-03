@@ -1,4 +1,5 @@
 import AVFAudio
+import CoreAudioKit
 
 /// A loaded plugin, set up for mono in and stereo out.
 final class Plugin {
@@ -41,5 +42,10 @@ final class Plugin {
     audioUnit.maximumFramesToRender = Self.maximumFrames
 
     try audioUnit.allocateRenderResources()
+  }
+
+  /// The plugin's own interface. Ask only once the plugin is running.
+  func requestEditor() async -> NSViewController? {
+    await audioUnit.requestViewController()
   }
 }

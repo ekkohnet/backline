@@ -70,7 +70,35 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
       Task { await logCounts() }
     } catch {
       logger.error("Couldn't start audio: \(error, privacy: .public)")
+      return
     }
+
+    await showEditor(of: plugin)
+  }
+
+  private func showEditor(of plugin: Plugin) async {
+    guard let editor = await plugin.requestEditor() else {
+      logger.error("\(plugin.supportedPlugin.name, privacy: .public) has no editor.")
+      return
+    }
+    let size = editor.view.frame.size
+    logger.notice(
+      "Editor is \(size.width, format: .fixed(precision: 0)) × \(size.height, format: .fixed(precision: 0))")
+    window?.contentViewController = editor
+    fitWindow(toEditorSize: size)
+
+  }
+
+  private func fitWindow(toEditorSize editorSize: NSSize) {
+    guard let window, let screen = window.screen else { return }
+    let available = window.contentRect(forFrameRect: screen.visibleFrame).size
+    let size = NSSize(
+      width: max(min(editorSize.width * 2, available.width), editorSize.width),
+      height: max(min(editorSize.height * 2, available.height), editorSize.height),
+    )
+    window.contentMinSize = editorSize
+    window.setContentSize(size)
+    window.center()
   }
 
   private func logCounts() async {
